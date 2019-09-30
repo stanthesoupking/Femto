@@ -171,5 +171,7 @@ int FEMTO_StartSystem(FEMTO_System* system)
 
 void _sayHello(FEMTO_View* view)
 {
+    FEMTO_Button_Data* button = (FEMTO_Button_Data*) view->viewData;
+    button->text = "You clicked me!";
     printf("Hello!\n");
 }
