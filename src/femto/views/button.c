@@ -1,15 +1,15 @@
-#include "femto/button.h"
+#include "femto/views/button.h"
 
 #include "femto/frame_data.h"
 
 #include <stdbool.h>
 
 // Internal button methods
-void _Update(FEMTO_View* view, FEMTO_FrameData* frameData);
-void _Render(FEMTO_View* view);
-void _Destroy(FEMTO_View* view);
+void _Button_Update(FEMTO_View* view, FEMTO_FrameData* frameData);
+void _Button_Render(FEMTO_View* view);
+void _Button_Destroy(FEMTO_View* view);
 
-FEMTO_View* FEMTO_CreateButton(char* name, FEMTO_TextRenderer* textRenderer, SDL_Renderer* renderer, char* text, SDL_Rect rect)
+FEMTO_View* FEMTO_CreateButton(char* name, FEMTO_View* parent, SDL_Renderer* renderer, FEMTO_TextRenderer* textRenderer, char* text, SDL_Rect rect)
 {
     FEMTO_Button_Data* button = (FEMTO_Button_Data*) malloc(sizeof(struct FEMTO_Button_Data_int));
 
@@ -20,7 +20,7 @@ FEMTO_View* FEMTO_CreateButton(char* name, FEMTO_TextRenderer* textRenderer, SDL
     button->state = UP;
     button->onClick = NULL;
 
-    FEMTO_View* view = FEMTO_CreateView(name, button, _Update, _Render, _Destroy);
+    FEMTO_View* view = FEMTO_CreateView(name, button, parent, _Button_Update, _Button_Render, _Button_Destroy);
 
     return view;
 }
@@ -31,7 +31,7 @@ void FEMTO_SetButtonOnClick(FEMTO_View* view, void (*onClick)(FEMTO_View* view))
     button->onClick = onClick;
 }
 
-void _Update(FEMTO_View* view, FEMTO_FrameData* frameData)
+void _Button_Update(FEMTO_View* view, FEMTO_FrameData* frameData)
 {
     FEMTO_Button_Data* button = (FEMTO_Button_Data*) view->viewData;
 
@@ -63,7 +63,7 @@ void _Update(FEMTO_View* view, FEMTO_FrameData* frameData)
     }
 }
 
-void _Render(FEMTO_View* view)
+void _Button_Render(FEMTO_View* view)
 {
     FEMTO_Button_Data* button = (FEMTO_Button_Data*) view->viewData;
 
@@ -97,7 +97,7 @@ void _Render(FEMTO_View* view)
     FEMTO_RenderText(button->textRenderer, button->text, &textDim);
 }
 
-void _Destroy(FEMTO_View* view)
+void _Button_Destroy(FEMTO_View* view)
 {
     // Clear allocated variables
 }

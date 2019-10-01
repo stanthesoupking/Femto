@@ -44,3 +44,10 @@ void* FEMTO_LinkedListFind(FEMTO_LinkedList* list, void* key, bool (*compare)(vo
  * Key is a utility variable for that is passed to the compare method.
  */
 void FEMTO_LinkedListRemove(FEMTO_LinkedList* list, void* key, bool (*compare)(void* key, void* data));
+
+/**
+ * Run the given method on each element in the list.
+ * 
+ * The 'extra' parameter is optional data that can be included in each call.
+ */
+void FEMTO_LinkedListTraverse(FEMTO_LinkedList* list, void (*call)(void* data, void* extra), void* extra);

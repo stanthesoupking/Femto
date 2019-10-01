@@ -89,3 +89,19 @@ void FEMTO_LinkedListRemove(FEMTO_LinkedList* list, void* key, bool (*compare)(v
     // TODO: Implement this
     // ...
 }
+
+/**
+ * Run the given method on each element in the list.
+ * 
+ * The 'extra' parameter is optional data that can be included in each call.
+ */
+void FEMTO_LinkedListTraverse(FEMTO_LinkedList* list, void (*call)(void* data, void* extra), void* extra)
+{
+        FEMTO_LinkedList_Node* n = list->head;
+        // Traverse to end of list
+        while(n != NULL)
+        {
+            call(n->data, extra);
+            n = n->next;
+        }
+}

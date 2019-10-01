@@ -22,5 +22,5 @@ typedef struct FEMTO_Button_Data_int
 }
 FEMTO_Button_Data;
 
-FEMTO_View* FEMTO_CreateButton(char* name, FEMTO_TextRenderer* textRenderer, SDL_Renderer* renderer, char* text, SDL_Rect rect);
+FEMTO_View* FEMTO_CreateButton(char* name, FEMTO_View* parent, SDL_Renderer* renderer, FEMTO_TextRenderer* textRenderer, char* text, SDL_Rect rect);
 void FEMTO_SetButtonOnClick(FEMTO_View* view, void (*onClick)(FEMTO_View* view));

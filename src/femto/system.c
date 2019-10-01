@@ -7,7 +7,8 @@
 #include <stdbool.h>
 
 #include "femto/text_renderer.h"
-#include "femto/button.h"
+#include "femto/views/button.h"
+#include "applications/hidden/bar.h"
 
 #define FEMTO_STR_TITLE "Femto"
 #define FEMTO_STR_VERSION "0.0.1"
@@ -28,6 +29,9 @@ FEMTO_System* FEMTO_CreateSystem()
     FEMTO_System* system = (FEMTO_System*) malloc(sizeof(struct FEMTO_System_int));
 
     system->runningApplication = NULL;
+    system->window = NULL;
+    system->screenSurface = NULL;
+    system->renderer = NULL;
 
     return system;
 }
@@ -42,22 +46,18 @@ void _sayHello(FEMTO_View* view);
 
 int FEMTO_StartSystem(FEMTO_System* system)
 {
-    SDL_Window *window = NULL;
-    SDL_Surface *screenSurface = NULL;
-    SDL_Renderer *renderer = NULL;
-
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         fprintf(stderr, "Could not initialize SDL2: %s\n", SDL_GetError());
         return 1;
     }
 
-    window = SDL_CreateWindow(
+    system->window = SDL_CreateWindow(
         FEMTO_STR_FULL_TITLE,
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         SCREEN_WIDTH, SCREEN_HEIGHT,
         SDL_WINDOW_SHOWN);
-    if (window == NULL)
+    if (system->window == NULL)
     {
         fprintf(stderr, "Could not create SDL2 window: %s\n", SDL_GetError());
         return 1;
@@ -65,15 +65,15 @@ int FEMTO_StartSystem(FEMTO_System* system)
 
     IMG_Init(IMG_INIT_PNG);
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+    system->renderer = SDL_CreateRenderer(system->window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 
     #if FEMTO_2X_SCALE
         SDL_RenderSetScale(renderer, 2.0f, 2.0f);
     #endif
 
     // Create text renderer
-    FEMTO_TextRenderer* textRenderer = FEMTO_CreateTextRenderer(renderer, "../res/font.png", 7, 11);
-    if(!textRenderer)
+    system->textRenderer = FEMTO_CreateTextRenderer(system->renderer, "../res/font.png", 7, 11);
+    if(!system->textRenderer)
     {
         fprintf(stderr, "Could not create text renderer.\n");
         return 1;
@@ -85,7 +85,9 @@ int FEMTO_StartSystem(FEMTO_System* system)
     dst.w = 100;
     dst.h = 100;
 
-    FEMTO_View* button = FEMTO_CreateButton("MyButton", textRenderer, renderer, "Hello Button :)", (SDL_Rect) {16, 64, 120, 32});
+    FEMTO_Application* bar = APP_SpawnBar(system);
+
+    FEMTO_View* button = FEMTO_CreateButton("MyButton", NULL, system->renderer, system->textRenderer, "Hello Button :)", (SDL_Rect) {16, 64, 120, 32});
     FEMTO_SetButtonOnClick(button, _sayHello);
 
     int mouseX = 0;
@@ -132,6 +134,8 @@ int FEMTO_StartSystem(FEMTO_System* system)
 
         // Update elements
         FEMTO_UpdateView(button, frameData);
+        // Update bar
+        FEMTO_UpdateApplication(bar, frameData);
 
         // Update cleanup
         FEMTO_DestroyFrameData(frameData);
@@ -139,31 +143,35 @@ int FEMTO_StartSystem(FEMTO_System* system)
         // Render elements
 
         // Clear white
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderClear(renderer);
+        SDL_SetRenderDrawColor(system->renderer, 255, 255, 255, 255);
+        SDL_RenderClear(system->renderer);
 
-        FEMTO_SetTextRendererColor(textRenderer, 0, 0, 0);
-        FEMTO_RenderText(textRenderer, FEMTO_STR_FULL_TITLE, &dst);
+        FEMTO_SetTextRendererColor(system->textRenderer, 0, 0, 0);
+        FEMTO_RenderText(system->textRenderer, FEMTO_STR_FULL_TITLE, &dst);
         FEMTO_RenderView(button);
+
+        // Render bar on top
+        FEMTO_RenderApplication(bar);
 
         #if SHOW_FPS
         {
             float fps = 1.0f / dt;
 
             // Show FPS above everything else
-            FEMTO_SetTextRendererColor(textRenderer, 255, 255, 0);
             char fpsString[30];
             sprintf(fpsString, "FPS: %.f", fps);
-            SDL_Rect fpsDim = FEMTO_GetRenderTextDim(textRenderer, fpsString);
-            SDL_RenderFillRect(renderer, &fpsDim);
-            FEMTO_RenderText(textRenderer, fpsString, &fpsDim);
+            SDL_Rect fpsDim = FEMTO_GetRenderTextDim(system->textRenderer, fpsString);
+            SDL_SetRenderDrawColor(system->renderer, 0, 0, 0, 255);
+            SDL_RenderFillRect(system->renderer, &fpsDim);
+            FEMTO_SetTextRendererColor(system->textRenderer, 255, 255, 0);
+            FEMTO_RenderText(system->textRenderer, fpsString, &fpsDim);
         }
         #endif
 
-        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(system->renderer);
     }
 
-    SDL_DestroyWindow(window);
+    SDL_DestroyWindow(system->window);
     SDL_Quit();
 
     return 0;

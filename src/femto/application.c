@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-FEMTO_Application* FEMTO_CreateApplication( char* name, void * data,
+FEMTO_Application* FEMTO_CreateApplication(FEMTO_System* system, char* name, void * data,
     FEMTO_Screen** screens, int activeScreen,
     void (*update)(FEMTO_Application* application, FEMTO_FrameData* frameData),
     void (*destroy)(FEMTO_Application* application)
@@ -10,6 +10,7 @@ FEMTO_Application* FEMTO_CreateApplication( char* name, void * data,
 {
     FEMTO_Application* application = (FEMTO_Application*) malloc(sizeof(struct FEMTO_Application_int));
 
+    application->system = system;
     application->name = name;
     application->applicationData = data;
     application->screens = screens;
@@ -34,7 +35,7 @@ void FEMTO_DestroyApplication(FEMTO_Application* application)
     free(application);
 }
 
-void FEMTO_UpdateApplicaiton(FEMTO_Application* application, FEMTO_FrameData* frameData)
+void FEMTO_UpdateApplication(FEMTO_Application* application, FEMTO_FrameData* frameData)
 {
     application->update(application, frameData);
 }

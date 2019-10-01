@@ -12,11 +12,13 @@ include_directories(include ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 file(GLOB Femto_SRC
     "src/*.c"
     "src/*/*.c"
+    "src/*/*/*.c"
 )
 
 file(GLOB Femto_INC
     "include/*.h"
     "include/*/*.h"
+    "include/*/*/*.h"
 )
 
 add_executable(Femto ${Femto_SRC} ${Femto_INC})

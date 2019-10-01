@@ -1,10 +1,17 @@
 #pragma once
 
-#include "femto/application.h"
+#include "femto/text_renderer.h"
+
+typedef struct FEMTO_Application_int FEMTO_Application;
 
 typedef struct FEMTO_System_int
 {
     FEMTO_Application* runningApplication;
+    FEMTO_TextRenderer* textRenderer;
+
+    SDL_Window* window;
+    SDL_Surface* screenSurface;
+    SDL_Renderer* renderer;
 }
 FEMTO_System;
 
