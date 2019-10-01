@@ -8,13 +8,15 @@ struct FEMTO_FrameData_int
     bool final; // Has the frame data been finalised; can no longer be modified
     float dt; // Delta time in ms
 
+    FEMTO_System* system;
     FEMTO_FrameData_Mouse mouse;
 };
 
-FEMTO_FrameData* FEMTO_CreateFrameData(float dt, int mouseX, int mouseY, bool mouseDown)
+FEMTO_FrameData* FEMTO_CreateFrameData(FEMTO_System* system, float dt, int mouseX, int mouseY, bool mouseDown)
 {
     FEMTO_FrameData* frameData = (FEMTO_FrameData*) malloc(sizeof(struct FEMTO_FrameData_int));
 
+    frameData->system = system;
     frameData->final = false;
     frameData->dt = dt;
     frameData->mouse.x = mouseX;
@@ -59,7 +61,13 @@ void FEMTO_SetFrameDataMouseDown(FEMTO_FrameData* frameData, bool mouseDown)
     }
 }
 
-FEMTO_FrameData_Mouse FEMTO_GetFrameDataMouseStatus(FEMTO_FrameData* frameData)
+FEMTO_FrameData_Mouse FEMTO_GetFrameDataMouseStatus(SDL_Rect* applicationArea, FEMTO_FrameData* frameData)
 {
-    return frameData->mouse;
+    // Get mouse position relative to application viewport
+    FEMTO_FrameData_Mouse mouse = frameData->mouse;
+
+    mouse.x -= applicationArea->x;
+    mouse.y -= applicationArea->y;
+
+    return mouse;
 }

@@ -11,15 +11,15 @@ FEMTO_Screen* FEMTO_CreateScreen(FEMTO_View* root)
     return screen;
 }
 
+void FEMTO_RenderScreen(FEMTO_Screen* screen)
+{
+    FEMTO_RenderView(screen->root);
+}
+
 void FEMTO_DestroyScreen(FEMTO_Screen* screen)
 {
     // Free the screen's root element
     FEMTO_DestroyView(screen->root);
 
     free(screen);
-}
-
-void FEMTO_RenderScreen(FEMTO_Screen* screen)
-{
-    FEMTO_RenderView(screen->root);
 }

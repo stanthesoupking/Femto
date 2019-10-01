@@ -8,6 +8,8 @@
 
 #include "femto/text_renderer.h"
 #include "femto/views/button.h"
+
+#include "applications/test/test_application.h"
 #include "applications/hidden/bar.h"
 
 #define FEMTO_STR_TITLE "Femto"
@@ -24,6 +26,9 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 480
 
+// The height of the main panel
+#define PANEL_HEIGHT 26
+
 FEMTO_System* FEMTO_CreateSystem()
 {
     FEMTO_System* system = (FEMTO_System*) malloc(sizeof(struct FEMTO_System_int));
@@ -32,6 +37,7 @@ FEMTO_System* FEMTO_CreateSystem()
     system->window = NULL;
     system->screenSurface = NULL;
     system->renderer = NULL;
+    system->applicationArea = (SDL_Rect) {0, PANEL_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT - PANEL_HEIGHT};
 
     return system;
 }
@@ -56,7 +62,7 @@ int FEMTO_StartSystem(FEMTO_System* system)
         FEMTO_STR_FULL_TITLE,
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         SCREEN_WIDTH, SCREEN_HEIGHT,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+        SDL_WINDOW_SHOWN);
     if (system->window == NULL)
     {
         fprintf(stderr, "Could not create SDL2 window: %s\n", SDL_GetError());
@@ -87,8 +93,8 @@ int FEMTO_StartSystem(FEMTO_System* system)
 
     FEMTO_Application* bar = APP_SpawnBar(system);
 
-    FEMTO_View* button = FEMTO_CreateButton("MyButton", NULL, system->renderer, system->textRenderer, "Hello Button :)", (SDL_Rect) {16, 64, 120, 32});
-    FEMTO_SetButtonOnClick(button, _sayHello);
+    // Start test application
+    system->runningApplication = APP_SpawnTestApplication(system);
 
     int mouseX = 0;
     int mouseY = 0;
@@ -105,7 +111,7 @@ int FEMTO_StartSystem(FEMTO_System* system)
         pTime = nTime;
 
         // Create new frame data
-        FEMTO_FrameData* frameData = FEMTO_CreateFrameData(dt, mouseX, mouseY, mouseDown);
+        FEMTO_FrameData* frameData = FEMTO_CreateFrameData(system, dt, mouseX, mouseY, mouseDown);
         while (SDL_PollEvent(&e)){
             if (e.type == SDL_QUIT)
             {
@@ -132,10 +138,14 @@ int FEMTO_StartSystem(FEMTO_System* system)
         }
         FEMTO_FinaliseFrameData(frameData);
 
-        // Update elements
-        FEMTO_UpdateView(button, frameData);
         // Update bar
         FEMTO_UpdateApplication(bar, frameData);
+
+        // Update runnning application
+        if(system->runningApplication != NULL)
+        {
+            FEMTO_UpdateApplication(system->runningApplication, frameData);
+        }
 
         // Update cleanup
         FEMTO_DestroyFrameData(frameData);
@@ -146,9 +156,11 @@ int FEMTO_StartSystem(FEMTO_System* system)
         SDL_SetRenderDrawColor(system->renderer, 255, 255, 255, 255);
         SDL_RenderClear(system->renderer);
 
-        FEMTO_SetTextRendererColor(system->textRenderer, 0, 0, 0);
-        FEMTO_RenderText(system->textRenderer, FEMTO_STR_FULL_TITLE, &dst);
-        FEMTO_RenderView(button);
+        // Render running application
+        if(system->runningApplication != NULL)
+        {
+            FEMTO_RenderApplication(system->runningApplication);
+        }
 
         // Render bar on top
         FEMTO_RenderApplication(bar);

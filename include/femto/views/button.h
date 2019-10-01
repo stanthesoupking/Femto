@@ -13,14 +13,12 @@ enum FEMTO_Button_State
 
 typedef struct FEMTO_Button_Data_int
 {
-    SDL_Renderer* renderer;
     FEMTO_TextRenderer* textRenderer;
     enum FEMTO_Button_State state;
     char* text;
-    SDL_Rect rect;
     void (*onClick)(FEMTO_View* view);
 }
 FEMTO_Button_Data;
 
-FEMTO_View* FEMTO_CreateButton(char* name, FEMTO_View* parent, SDL_Renderer* renderer, FEMTO_TextRenderer* textRenderer, char* text, SDL_Rect rect);
+FEMTO_View* FEMTO_CreateButton(char* name, FEMTO_Application* application, FEMTO_View* parent, FEMTO_TextRenderer* textRenderer, char* text);
 void FEMTO_SetButtonOnClick(FEMTO_View* view, void (*onClick)(FEMTO_View* view));

@@ -17,6 +17,8 @@ struct FEMTO_Application_int
 
     FEMTO_Screen** screens; // UI Screens available to the application
     int activeScreen; // Index of the current active-screen
+
+    SDL_Rect rect; // The rect of the application
     
     // Update function, called each frame
     void (*update)(FEMTO_Application* application, FEMTO_FrameData* frameData);
@@ -31,6 +33,8 @@ FEMTO_Application* FEMTO_CreateApplication(FEMTO_System* system, char* name, voi
     void (*update)(FEMTO_Application* application, FEMTO_FrameData* frameData),
     void (*destroy)(FEMTO_Application* application)
 );
+
+SDL_Rect FEMTO_GetApplicationRect(FEMTO_Application* application);
 
 void FEMTO_UpdateApplication(FEMTO_Application* application, FEMTO_FrameData* frameData);
 void FEMTO_RenderApplication(FEMTO_Application* application);

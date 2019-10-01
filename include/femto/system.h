@@ -12,6 +12,8 @@ typedef struct FEMTO_System_int
     SDL_Window* window;
     SDL_Surface* screenSurface;
     SDL_Renderer* renderer;
+
+    SDL_Rect applicationArea;
 }
 FEMTO_System;
 

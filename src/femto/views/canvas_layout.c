@@ -7,13 +7,11 @@ void _CanvasLayout_Update(FEMTO_View* view, FEMTO_FrameData* frameData);
 void _CanvasLayout_Render(FEMTO_View* view);
 void _CanvasLayout_Destroy(FEMTO_View* view);
 
-FEMTO_View* FEMTO_CreateCanvasLayout(char* name, FEMTO_View* parent, SDL_Renderer* renderer, SDL_Rect rect)
+FEMTO_View* FEMTO_CreateCanvasLayout(char* name, FEMTO_Application* application, FEMTO_View* parent)
 {
     FEMTO_CanvasLayout_Data* data = (FEMTO_CanvasLayout_Data*) malloc(sizeof(struct FEMTO_CanvasLayout_Data_int));
-    data->renderer = renderer;
-    data->rect = rect;
 
-    FEMTO_View* view = FEMTO_CreateView(name, data, parent, _CanvasLayout_Update,
+    FEMTO_View* view = FEMTO_CreateView(name, data, application, parent, _CanvasLayout_Update,
         _CanvasLayout_Render, _CanvasLayout_Destroy);
 
     return view;
@@ -35,18 +33,20 @@ void FEMTO_SetCanvasLayoutFill(FEMTO_View* view, bool fill)
 
 void _CanvasLayout_Update(FEMTO_View* view, FEMTO_FrameData* frameData)
 {
-
+    // Canvas layouts rely on absolute rects for positioning
+    // Do nothing here.
 }
 
 void _CanvasLayout_Render(FEMTO_View* view)
 {
     FEMTO_CanvasLayout_Data* data = (FEMTO_CanvasLayout_Data*) view->viewData;
+    SDL_Renderer* renderer = FEMTO_GetViewRenderer(view);
+    SDL_Rect viewRect = FEMTO_GetViewRect(view);
 
     if(data->fill)
     {
-        SDL_Renderer* renderer = data->renderer;
         FEMTO_SetRenderColour(renderer, &data->fillColour);
-        SDL_RenderFillRect(renderer, &data->rect);
+        SDL_RenderFillRect(renderer, &viewRect);
     }
 }
 

@@ -4,7 +4,7 @@
 
 typedef struct APP_Bar_Data_int
 {
-    SDL_Renderer* renderer;
+
 }
 APP_Bar_Data;
 
