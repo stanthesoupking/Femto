@@ -56,7 +56,7 @@ int FEMTO_StartSystem(FEMTO_System* system)
         FEMTO_STR_FULL_TITLE,
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         SCREEN_WIDTH, SCREEN_HEIGHT,
-        SDL_WINDOW_SHOWN);
+        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if (system->window == NULL)
     {
         fprintf(stderr, "Could not create SDL2 window: %s\n", SDL_GetError());
